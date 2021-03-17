@@ -28,6 +28,10 @@ message BatchHeader {
     // List of transaction.header_signatures that match the order of
     // transactions required for the batch
     repeated string transaction_ids = 2;
+
+    // Group public key for the signernode witnesses that sign the
+    // Batch
+    bytes group_public_key = 3;
 }
 
 message Batch {
@@ -36,6 +40,16 @@ message Batch {
 
     // The signature derived from signing the header
     string header_signature = 2;
+
+    //Group signature to the Batch
+    //To validate if the signature is correct we should put
+    //an empty bytes
+    bytes group_signature = 5;
+
+    //Scheme used to sign the batch with the signature shares
+    //To validate if the signature is correct we should put
+    //an empty string
+    string group_signature_scheme = 6;
 
     // A list of the transactions that match the list of
     // transaction_ids listed in the batch header

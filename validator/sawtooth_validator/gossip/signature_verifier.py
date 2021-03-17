@@ -15,13 +15,14 @@
 
 import logging
 import hashlib
-
+import requests
 from sawtooth_signing import create_context
 from sawtooth_signing.secp256k1 import Secp256k1PublicKey
 
 from sawtooth_validator.protobuf import client_batch_submit_pb2
 from sawtooth_validator.protobuf.transaction_pb2 import TransactionHeader
 from sawtooth_validator.protobuf.batch_pb2 import BatchHeader
+from sawtooth_validator.protobuf.signerMessages_pb2 import ClientVerifyMessage
 from sawtooth_validator.protobuf.block_pb2 import BlockHeader
 from sawtooth_validator.protobuf.consensus_pb2 import \
     ConsensusPeerMessageHeader
@@ -32,7 +33,6 @@ from sawtooth_validator.networking.dispatch import HandlerStatus
 from sawtooth_validator.networking.dispatch import Handler
 from sawtooth_validator.protobuf.validator_pb2 import Message
 from sawtooth_validator.journal.timed_cache import TimedCache
-
 
 LOGGER = logging.getLogger(__name__)
 COLLECTOR = metrics.get_collector(__name__)
@@ -65,6 +65,13 @@ def is_valid_batch(batch):
     header = BatchHeader()
     header.ParseFromString(batch.header)
 
+    # Verify Group Signature validate_group_signature(batch) Changed
+    if not validate_group_signature(batch):
+        LOGGER.debug("failed to verify group signature")
+        return False
+
+    # End changed
+
     context = create_context('secp256k1')
     public_key = Secp256k1PublicKey.from_hex(header.signer_public_key)
     if not context.verify(batch.header_signature,
@@ -88,6 +95,53 @@ def is_valid_batch(batch):
                          txn.header_signature)
             return False
 
+    return True
+
+
+def validate_group_signature(batch):
+    LOGGER.info("Group Signature %s and scheme %s", batch.group_signature,
+                batch.group_signature_scheme)
+
+    # Remove the group signature and scheme to validate transaction
+    # correctly
+    tmp_group_signature = batch.group_signature
+    tmp_group_signature_scheme = batch.group_signature_scheme
+    batch.group_signature = b''
+    batch.group_signature_scheme = ""
+
+    remote_validation_call(batch,tmp_group_signature,tmp_group_signature_scheme)
+
+    batch.group_signature = tmp_group_signature
+    batch.group_signature_scheme = tmp_group_signature_scheme
+
+    return True
+
+
+def remote_validation_call(batch, group_signature, scheme):
+    header = BatchHeader()
+    header.ParseFromString(batch.header)
+
+    endpoint = "http://signernode-1:8080/verify"
+    digest = batch.SerializeToString()
+
+    # Create client verify message
+    verifyReq = ClientVerifyMessage()
+    verifyReq.Scheme = scheme
+    # It should get the public key via the configs
+    verifyReq.public_key = header.group_public_key
+    verifyReq.digest = digest
+    verifyReq.signature = group_signature
+
+    if len(header.group_public_key) == 0: #todo this is security risk, in order to remove remove this genesis block must be signed
+        LOGGER.info("Ignoring signature, group public key empty")
+        return True
+
+    data = verifyReq.SerializeToString()
+
+    # Send verification request
+    r = requests.post(url=endpoint, data=data)
+
+    LOGGER.info("Received response %s", r.text)
     return True
 
 

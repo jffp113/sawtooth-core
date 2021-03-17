@@ -1,0 +1,13 @@
+Source: sawtooth-validator
+Maintainer: unknown <unknown@unknown>
+Section: python
+Priority: optional
+Build-Depends: dh-python, python3-setuptools, python3-all, debhelper (>= 9)
+Standards-Version: 3.9.6
+Homepage: https://github.com/hyperledger/sawtooth-core
+
+Package: python3-sawtooth-validator
+Architecture: all
+Depends: ${misc:Depends}, ${python3:Depends}, libpython3-dev, openssl, libssl-dev, python3-cachetools
+Description: Sawtooth Validator
+

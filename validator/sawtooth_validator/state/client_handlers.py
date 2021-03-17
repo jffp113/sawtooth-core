@@ -1121,7 +1121,6 @@ class StatusGetRequest(_ClientRequestHandler):
             # {'endpoint': endpoint}
             for endpoint in self._gossip.get_peers().values()
         ]
-
         return self._wrap_response(
             endpoint=self._gossip.endpoint,
             peers=sorted(peers, key=lambda peer: peer.endpoint))

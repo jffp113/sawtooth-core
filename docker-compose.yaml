@@ -122,3 +122,14 @@ services:
     command: |
         devmode-engine-rust -v --connect tcp://validator:5050
     stop_signal: SIGKILL
+
+#  #I added this to do small tests
+#  intkey-tp:
+#    image: hyperledger/sawtooth-intkey-tp-python:nightly
+#    container_name: sawtooth-intkey-tp-python-default
+#    expose:
+#      - 4004
+#    depends_on:
+#      - validator
+#    command: intkey-tp-python -vv -C tcp://validator:4004
+#    stop_signal: SIGKILL

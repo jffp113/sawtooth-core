@@ -86,6 +86,7 @@ def add(
             journal.is_batch_pool_full),
         client_thread_pool)
 
+    # TODO check signature and drop msg if not valid
     dispatcher.add_handler(
         validator_pb2.Message.CLIENT_BATCH_SUBMIT_REQUEST,
         signature_verifier.BatchListSignatureVerifier(),
