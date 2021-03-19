@@ -1,0 +1,125 @@
+# Copyright 2018-2019 Bitwise IO, Inc.
+# Copyright 2019-2020 Cargill Incorporated
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+[package]
+name = "transact"
+version = "0.3.6"
+authors = ["Bitwise IO, Inc.", "Cargill Incorporated"]
+edition = "2018"
+license = "Apache-2.0"
+readme = "../README.md"
+description = """\
+    Transact is a transaction execution platform designed to be used as \
+    a library or component when implementing distributed ledgers, including \
+    blockchains.
+"""
+repository = "http://github.com/hyperledger/transact"
+
+[dependencies]
+bzip2 = { version = "0.3", optional = true }
+cbor-codec = { version = "0.7", optional = true }
+cylinder = "0.2"
+glob = { version = "0.3", optional = true }
+hex = "0.3"
+libc = ">=0.2.35"
+lmdb-zero = ">=0.4.1"
+log = { version = "0.4", features = ["std"] }
+openssl = "0.10"
+protobuf = "2"
+r2d2 = { version = "0.8", optional = true }
+r2d2_sqlite = { version = "0.15", optional = true }
+rand = "0.6"
+rand_hc = { version = "0.1", optional = true }
+redis = { version = "0.13.0", default-features = false, optional = true }
+rusqlite = { version = "0.22", optional = true }
+sawtooth-sdk = { version = "0.5", optional = true }
+semver = { version = "0.9", optional = true }
+serde = { version = "1.0", optional = true }
+serde_derive = { version = "1.0", optional = true }
+serde_yaml = { version = "0.8", optional = true }
+sha2 = "0.8"
+tar = { version = "0.4", optional = true }
+uuid = { version = "0.7", features = ["v4"] }
+
+[dev-dependencies]
+rusty-fork = "0.3"
+sawtooth-xo = "0.5"
+serial_test = "0.3"
+tempdir = "0.3"
+
+[build-dependencies]
+protoc-rust = "2.14"
+
+[features]
+default = [
+    "state-merkle",
+]
+
+stable = [
+    # The stable feature extends default:
+    "default",
+    # The following features are stable:
+    "contract-archive",
+]
+
+experimental = [
+    # The experimental feature extends stable:
+    "stable",
+    # The following features are experimental:
+    "contract",
+    "contract-address",
+    "contract-address-double-key-hash",
+    "contract-address-key-hash",
+    "contract-address-triple-key-hash",
+    "contract-context",
+    "contract-context-key-value",
+    "family-command",
+    "family-xo",
+    "key-value-state",
+    "redis-db",
+    "sqlite-db",
+    "workload",
+]
+
+nightly = []
+
+contract = []
+contract-address = ["contract"]
+contract-address-key-hash = ["contract-address"]
+contract-address-double-key-hash = ["contract-address"]
+contract-address-triple-key-hash = ["contract-address"]
+contract-archive = ["bzip2", "contract", "glob", "semver", "serde", "serde_derive", "serde_yaml", "tar"]
+contract-context = ["contract", "contract-address"]
+contract-context-key-value = ["contract-context", "key-value-state"]
+family-command = []
+family-xo = ["rand_hc", "workload"]
+key-value-state = []
+redis-db = ["redis"]
+sawtooth-compat = ["sawtooth-sdk"]
+sqlite-db = ["rusqlite", "r2d2", "r2d2_sqlite"]
+state-merkle = ["cbor-codec"]
+# This feature must be enabled to run the merkle tests using a redis db.  It is
+# not enabled by default, due to its requirement of an external redis instance.
+state-merkle-redis-db-tests = ["redis-db", "state-merkle"]
+workload = []
+
+[package.metadata.docs.rs]
+features = [
+  "default",
+  "nightly",
+  "experimental",
+  "sawtooth-compat",
+  "stable",
+]

@@ -18,6 +18,7 @@ import re
 import logging
 import json
 import base64
+import collections
 from aiohttp import web
 
 # pylint: disable=no-name-in-module,import-error
@@ -43,6 +44,7 @@ from sawtooth_rest_api.protobuf import client_status_pb2
 from sawtooth_rest_api.protobuf.block_pb2 import BlockHeader
 from sawtooth_rest_api.protobuf.batch_pb2 import BatchList
 from sawtooth_rest_api.protobuf.batch_pb2 import BatchHeader
+from sawtooth_rest_api.protobuf.batch_pb2 import GroupEnvelop
 from sawtooth_rest_api.protobuf.transaction_pb2 import TransactionHeader
 
 # pylint: disable=too-many-lines
@@ -872,7 +874,8 @@ class RouteHandler:
     def _expand_batch(cls, batch):
         """Deserializes a Batch's header, and the header of its Transactions.
         """
-        cls._parse_header(BatchHeader, batch)
+        cls._parse_batch_header(BatchHeader, batch)
+
         if 'transactions' in batch:
             batch['transactions'] = [
                 cls._expand_transaction(t) for t in batch['transactions']]
@@ -901,6 +904,29 @@ class RouteHandler:
             raise errors.ResourceHeaderInvalid() from e
 
         resource['header'] = cls._message_to_dict(header)
+        return resource
+
+    @classmethod
+    def _parse_batch_header(cls, header_proto, resource):
+        """Deserializes a resource's base64 encoded Protobuf header.
+        """
+        header = header_proto()
+        group_envelop = GroupEnvelop()
+        try:
+            header_bytes = base64.b64decode(resource['header'])
+            header.ParseFromString(header_bytes)
+            group_envelop.ParseFromString(header.group_envelop)
+        except (KeyError, TypeError, ValueError, DecodeError) as e:
+            header = resource.get('header', None)
+            LOGGER.error(
+                'The validator sent a resource with %s %s',
+                'a missing header' if header is None else 'an invalid header:',
+                header or '')
+            raise errors.ResourceHeaderInvalid() from e
+
+        resource['header'] = cls._message_to_dict(header)
+        resource['header_group_envelop'] = cls._message_to_dict(group_envelop)
+
         return resource
 
     @staticmethod

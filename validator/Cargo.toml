@@ -13,8 +13,10 @@ libc = ">=0.2.35"
 metrics = { version = "0.12", features = ["std"] }
 protobuf = "2.0"
 python3-sys = "0.2"
-sawtooth = { version = "0.6", features = ["validator-internals"] }
-transact = { version = "0.3", features = ["sawtooth-compat"] }
+#sawtooth = { version = "0.6", features = ["validator-internals"] }
+sawtooth = { path = "../sawtooth-lib/libsawtooth", features = ["validator-internals"]}
+#transact = { version = "0.3", features = ["sawtooth-compat"] }
+transact = { path = "../transact-0.3.6/libtransact", features = ["sawtooth-compat"] }
 
 
 # pull in smart contracts

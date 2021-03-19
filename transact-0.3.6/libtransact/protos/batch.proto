@@ -24,15 +24,15 @@ import "transaction.proto";
 message GroupEnvelop {
     // Group public key for the signernode witnesses that sign the
     // Batch
-    bytes public_key = 1;
+    bytes group_public_key = 1;
 
     //Group signature over the transactions
-    bytes signature = 2;
+    bytes group_signature = 2;
 
     //Scheme used to sign the batch with the signature shares
     //To validate if the signature is correct we should put
     //an empty string
-    string scheme = 3;
+    string group_signature_scheme = 3;
 }
 
 message BatchHeader {

@@ -400,9 +400,6 @@ class CompleterBatchListBroadcastHandler(Handler):
 
     def handle(self, connection_id, message_content):
         for batch in message_content.batches:
-            if batch.trace:
-                LOGGER.debug("TRACE %s: %s", batch.header_signature,
-                             self.__class__.__name__)
             self._completer.add_batch(batch)
             self._gossip.broadcast_batch(batch)
         return HandlerResult(status=HandlerStatus.PASS)

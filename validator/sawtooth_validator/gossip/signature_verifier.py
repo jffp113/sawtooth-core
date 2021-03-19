@@ -15,13 +15,16 @@
 
 import logging
 import hashlib
+import os
 import requests
 from sawtooth_signing import create_context
 from sawtooth_signing.secp256k1 import Secp256k1PublicKey
 
 from sawtooth_validator.protobuf import client_batch_submit_pb2
 from sawtooth_validator.protobuf.transaction_pb2 import TransactionHeader
+from sawtooth_validator.protobuf.transaction_pb2 import TransactionList
 from sawtooth_validator.protobuf.batch_pb2 import BatchHeader
+from sawtooth_validator.protobuf.batch_pb2 import GroupEnvelop
 from sawtooth_validator.protobuf.signerMessages_pb2 import ClientVerifyMessage
 from sawtooth_validator.protobuf.block_pb2 import BlockHeader
 from sawtooth_validator.protobuf.consensus_pb2 import \
@@ -99,40 +102,35 @@ def is_valid_batch(batch):
 
 
 def validate_group_signature(batch):
-    LOGGER.info("Group Signature %s and scheme %s", batch.group_signature,
-                batch.group_signature_scheme)
-
-    # Remove the group signature and scheme to validate transaction
-    # correctly
-    tmp_group_signature = batch.group_signature
-    tmp_group_signature_scheme = batch.group_signature_scheme
-    batch.group_signature = b''
-    batch.group_signature_scheme = ""
-
-    remote_validation_call(batch,tmp_group_signature,tmp_group_signature_scheme)
-
-    batch.group_signature = tmp_group_signature
-    batch.group_signature_scheme = tmp_group_signature_scheme
-
-    return True
-
-
-def remote_validation_call(batch, group_signature, scheme):
+    # Parse header to get group signature envelop
     header = BatchHeader()
     header.ParseFromString(batch.header)
 
-    endpoint = "http://signernode-1:8080/verify"
-    digest = batch.SerializeToString()
+    envelop = GroupEnvelop()
+    envelop.ParseFromString(header.group_envelop)
+
+    transactions = batch.transactions
+    transaction_list = TransactionList()
+    transaction_list.transactions.extend(transactions)
+    transactions_bytes = transaction_list.SerializeToString()
+
+    verify_group_signature(transactions_bytes, envelop.signature, envelop.public_key, envelop.scheme)
+    return True
+
+
+def verify_group_signature(digest, group_signature, group_public_key, scheme):
+    signernode_endpoint = os.getenv('SIGNERNODE', "signernode-1")
+    endpoint = "http://{}:8080/verify".format(signernode_endpoint)
 
     # Create client verify message
     verifyReq = ClientVerifyMessage()
     verifyReq.Scheme = scheme
-    # It should get the public key via the configs
-    verifyReq.public_key = header.group_public_key
+    verifyReq.public_key = group_public_key
     verifyReq.digest = digest
     verifyReq.signature = group_signature
 
-    if len(header.group_public_key) == 0: #todo this is security risk, in order to remove remove this genesis block must be signed
+    # todo this is security risk, in order to remove remove this genesis block must be signed
+    if len(group_public_key) == 0:
         LOGGER.info("Ignoring signature, group public key empty")
         return True
 
@@ -140,7 +138,7 @@ def remote_validation_call(batch, group_signature, scheme):
 
     # Send verification request
     r = requests.post(url=endpoint, data=data)
-
+    # Todo parse the response
     LOGGER.info("Received response %s", r.text)
     return True
 
