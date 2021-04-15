@@ -24,7 +24,7 @@ services:
         - http_proxy
         - https_proxy
         - no_proxy
-    image: sawtooth-validator:${ISOLATION_ID}
+    image: ghcr.io/jffp113/sawtooth-validator:${ISOLATION_ID}
     container_name: sawtooth-validator-default
     expose:
       - 4004
@@ -56,7 +56,7 @@ services:
         - http_proxy
         - https_proxy
         - no_proxy
-    image: sawtooth-rest-api:${ISOLATION_ID}
+    image: ghcr.io/jffp113/sawtooth-rest-api:${ISOLATION_ID}
     container_name: sawtooth-rest-api-default
     ports:
       - "8008:8008"

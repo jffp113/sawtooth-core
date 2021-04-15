@@ -22,7 +22,7 @@ services:
 # -------------=== rest api ===-------------
 
   rest-api-0:
-    image: sawtooth-rest-api:latest
+    image: ghcr.io/jffp113/sawtooth-rest-api:latest
     container_name: sawtooth-rest-api-default-0
     expose:
       - 8008
@@ -37,7 +37,7 @@ services:
     stop_signal: SIGKILL
 
   rest-api-1:
-    image: sawtooth-rest-api:latest
+    image: ghcr.io/jffp113/sawtooth-rest-api:latest
     container_name: sawtooth-rest-api-default-1
     expose:
       - 8008
@@ -50,7 +50,7 @@ services:
     stop_signal: SIGKILL
 
   rest-api-2:
-    image: sawtooth-rest-api:latest
+    image: ghcr.io/jffp113/sawtooth-rest-api:latest
     container_name: sawtooth-rest-api-default-2
     expose:
       - 8008
@@ -63,7 +63,7 @@ services:
     stop_signal: SIGKILL
 
   rest-api-3:
-    image: sawtooth-rest-api:latest
+    image: ghcr.io/jffp113/sawtooth-rest-api:latest
     container_name: sawtooth-rest-api-default-3
     expose:
       - 8008
@@ -76,7 +76,7 @@ services:
     stop_signal: SIGKILL
 
   rest-api-4:
-    image: hyperledger/sawtooth-rest-api:nightly
+    image: ghcr.io/jffp113/sawtooth-rest-api:latest
     container_name: sawtooth-rest-api-default-4
     expose:
       - 8008
@@ -106,7 +106,7 @@ services:
 
   validator-0:
      #image: hyperledger/sawtooth-rest-api:nightly
-    image: sawtooth-validator:latest
+    image: ghcr.io/jffp113/sawtooth-validator:latest
     container_name: sawtooth-validator-default-0
     expose:
       - 4004
@@ -164,7 +164,7 @@ services:
 
   validator-1:
      #image: hyperledger/sawtooth-rest-api:nightly
-    image: sawtooth-validator:latest
+    image: ghcr.io/jffp113/sawtooth-validator:latest
     container_name: sawtooth-validator-default-1
     expose:
       - 4004
@@ -200,7 +200,7 @@ services:
 
   validator-2:
      #image: hyperledger/sawtooth-rest-api:nightly
-    image: sawtooth-validator:latest
+    image: ghcr.io/jffp113/sawtooth-validator:latest
     container_name: sawtooth-validator-default-2
     expose:
       - 4004
@@ -237,7 +237,7 @@ services:
 
   validator-3:
      #image: hyperledger/sawtooth-rest-api:nightly
-    image: sawtooth-validator:latest
+    image: ghcr.io/jffp113/sawtooth-validator:latest
     container_name: sawtooth-validator-default-3
     expose:
       - 4004
@@ -275,7 +275,7 @@ services:
 
   validator-4:
      #image: hyperledger/sawtooth-rest-api:nightly
-    image: sawtooth-validator:latest
+    image: ghcr.io/jffp113/sawtooth-validator:latest
     container_name: sawtooth-validator-default-4
     expose:
       - 4004
