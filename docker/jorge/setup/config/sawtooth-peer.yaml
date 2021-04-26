@@ -59,6 +59,8 @@ services:
       - 4004
       - 5050
       - 8800
+    ports:
+      - 8800:8800
     environment:
       - SIGNERNODE=signernode-1
 #    volumes:
@@ -69,14 +71,14 @@ services:
         cp /all/validator-2.priv /etc/sawtooth/keys/validator.priv &&
         sawtooth keygen my_key &&
         sawtooth-validator -vv \
-          --endpoint tcp://eth0:8800 \
+          --endpoint tcp://188.83.81.75:8800 \
           --bind component:tcp://eth0:4004 \
           --bind consensus:tcp://eth0:5050 \
           --bind network:tcp://eth0:8800 \
           --scheduler parallel \
           --peering static \
           --maximum-peer-connectivity 10000 \
-          --peers tcp://validator-0:8800 \
+          --peers tcp://51.83.75.29:8800 \
       "
 # -------------=== pbft engines ===-------------
   pbft:

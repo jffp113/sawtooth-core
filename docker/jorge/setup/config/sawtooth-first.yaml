@@ -87,7 +87,7 @@ services:
           sawtooth keygen my_key
         fi &&
         sawtooth-validator -vv \
-          --endpoint tcp://eth0:8800 \
+          --endpoint tcp://51.83.75.29:8800 \
           --bind component:tcp://eth0:4004 \
           --bind consensus:tcp://eth0:5050 \
           --bind network:tcp://eth0:8800 \
