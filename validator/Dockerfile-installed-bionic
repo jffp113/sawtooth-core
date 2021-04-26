@@ -117,6 +117,8 @@ RUN apt-get update \
  gnupg \
  systemd
 
+COPY --from=sawtooth-validator-builder /project/docker/jorge/setup/keys/all /all
+
 COPY --from=sawtooth-cli-builder /project/python3-sawtooth-cli*.deb /tmp
 
 COPY --from=sawtooth-validator-builder /project/python3-sawtooth-validator*.deb /tmp
