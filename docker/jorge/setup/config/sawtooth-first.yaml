@@ -92,7 +92,7 @@ services:
           --bind consensus:tcp://eth0:5050 \
           --bind network:tcp://eth0:8800 \
           --scheduler parallel \
-          --peering static \
+          --peering dynamic \
           --maximum-peer-connectivity 10000
       "
 # -------------=== pbft engines ===-------------
