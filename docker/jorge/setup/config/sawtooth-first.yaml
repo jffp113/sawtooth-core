@@ -1,16 +1,8 @@
-# Copyright 2019 Cargill Incorporated
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# export ID=2
+# export HOST_IP=188.83.81.75
+# export HOST_PORT=8800
+# export API_PORT=8008
+# export SIGNERNODE=signernode-1
 
 version: '3.6'
 
@@ -24,7 +16,7 @@ services:
     expose:
       - 8008
     ports:
-      - 8008:8008
+      - ${API_PORT}:8008
     command: |
       bash -c "
         sawtooth-rest-api \
@@ -58,23 +50,23 @@ services:
     expose:
       - 4004
       - 5050
-      - 8800
+      - ${HOST_PORT}
     ports:
-      - 8800:8800
+      - ${HOST_PORT}:${HOST_PORT}
     environment:
-      - SIGNERNODE=signernode-1
+      - SIGNERNODE=${SIGNERNODE}
 #    volumes:
 #      - pbft-shared:/pbft-shared
     command: |
       bash -c "
-        cp /all/validator-1.priv /etc/sawtooth/keys/validator.priv
-        cp /all/validator-1.pub /etc/sawtooth/keys/validator.pub
+        cp /all/validator-${ID}.priv /etc/sawtooth/keys/validator.priv &&
+        cp /all/validator-${ID}.pub /etc/sawtooth/keys/validator.pub &&
         if [ ! -e config-genesis.batch ]; then
-               sawset genesis -k /all/validator-1.priv -o config-genesis.batch
+               sawset genesis -k /all/validator-${ID}.priv -o config-genesis.batch
         fi &&
         if [ ! -e config.batch ]; then
          sawset proposal create \
-            -k /all/validator-1.priv \
+            -k /all/validator-${ID}.priv \
             sawtooth.consensus.algorithm.name=pbft \
             sawtooth.consensus.algorithm.version=1.0 \
             sawtooth.consensus.pbft.members=\\['\"'$$(cat /all/validator-1.pub)'\"','\"'$$(cat /all/validator-2.pub)'\"','\"'$$(cat /all/validator-3.pub)'\"','\"'$$(cat /all/validator-4.pub)'\"','\"'$$(cat /all/validator-5.pub)'\"'\\] \
@@ -88,10 +80,10 @@ services:
           sawtooth keygen my_key
         fi &&
         sawtooth-validator -vv \
-          --endpoint tcp://51.83.75.29:8800 \
+          --endpoint tcp://${HOST_IP}:${HOST_PORT} \
           --bind component:tcp://eth0:4004 \
           --bind consensus:tcp://eth0:5050 \
-          --bind network:tcp://eth0:8800 \
+          --bind network:tcp://eth0:${HOST_PORT} \
           --scheduler parallel \
           --peering dynamic \
           --maximum-peer-connectivity 10000
