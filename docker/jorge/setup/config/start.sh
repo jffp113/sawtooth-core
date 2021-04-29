@@ -32,7 +32,7 @@ SIGNER_PORT=7000
     export API_PORT=${API_PORT} &&
     export SIGNERNODE=${SIGNERSNODES[ID - 1]}:${SIGNER_PORT} &&
     cd /home/jfp/sawtooth-core/docker/jorge/setup/config &&
-    docker-compose -p ${ID} -f sawtooth-peer.yaml up --detach
+    docker-compose -p ${ID} -f sawtooth-first.yaml up --detach
     '
   "
   echo "- ${SERVERS[ID - 1]}:${API_PORT}"
