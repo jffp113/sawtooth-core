@@ -48,11 +48,11 @@ do
   SIGNER_PORT=$((SIGNER_PORT + 1))
 
 
-  options=""
-  for peer in ${SERVERS[@]::$((ID - 1))}
-  do
-    options="${options}--peers ${peer} "
-  done
+#  options=""
+#  for peer in ${SERVERS[@]::$((ID - 1))}
+#  do
+#    options="${options} --peers tcp://${peer}:${SEED_PORT}"
+#  done
 
   CMD="bash -c '
     export ID=${ID} &&
@@ -60,8 +60,7 @@ do
     export HOST_PORT=${HOST_PORT} &&
     export API_PORT=${API_PORT} &&
     export SIGNERNODE=${SIGNERSNODES[ID - 1]}:${SIGNER_PORT}
-    export SEED=tcp://${SERVERS}:${SEED_PORT} &&
-    export SEED=\"${options}\" &&
+    export SEED=tcp://${SERVERS[0]}:${SEED_PORT} &&
     cd /home/jfp/sawtooth-core/docker/jorge/setup/config &&
     docker-compose -p ${ID} -f sawtooth-peer.yaml up --detach
     '
