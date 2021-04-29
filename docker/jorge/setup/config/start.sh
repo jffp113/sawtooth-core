@@ -27,7 +27,7 @@ SIGNER_PORT=7000
 
  CMD="bash -c '
     export ID=${ID} &&
-    export HOST_IP=${s} &&
+    export HOST_IP=${SERVERS[ID - 1]} &&
     export HOST_PORT=${HOST_PORT} &&
     export API_PORT=${API_PORT} &&
     export SIGNERNODE=${SIGNERSNODES[ID - 1]}:${SIGNER_PORT} &&
@@ -37,6 +37,8 @@ SIGNER_PORT=7000
   "
   echo "- ${SERVERS[ID - 1]}:${API_PORT}"
   echo $CMD | ssh -t jfp@${SERVERS[ID - 1]} bash
+
+sleep 2
 
 for s in ${SERVERS[@]:1}
 do
