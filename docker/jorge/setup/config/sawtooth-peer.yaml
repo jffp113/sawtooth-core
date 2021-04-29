@@ -9,6 +9,7 @@
 # export HOST_PORT=8800
 # export API_PORT=8008
 # export SEED=tcp://51.83.75.29:8800
+# export SIGNERNODE=signernode-1
 
 version: '3.6'
 
@@ -60,7 +61,7 @@ services:
     ports:
       - ${HOST_PORT}:${HOST_PORT}
     environment:
-      - SIGNERNODE=signernode-1
+      - SIGNERNODE=${SIGNERNODE}
 #    volumes:
 #      - pbft-shared:/pbft-shared
     command: |

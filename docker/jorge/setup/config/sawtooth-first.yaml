@@ -68,6 +68,7 @@ services:
     command: |
       bash -c "
         cp /all/validator-1.priv /etc/sawtooth/keys/validator.priv
+        cp /all/validator-1.pub /etc/sawtooth/keys/validator.pub
         if [ ! -e config-genesis.batch ]; then
                sawset genesis -k /all/validator-1.priv -o config-genesis.batch
         fi &&

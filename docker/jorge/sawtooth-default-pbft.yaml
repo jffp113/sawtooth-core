@@ -113,7 +113,7 @@ services:
       - 5050
       - 8800
     environment:
-      - SIGNERNODE=signernode-1
+      - SIGNERNODE=signernode-1:8080
     volumes:
       - pbft-shared:/pbft-shared
     command: |
@@ -171,7 +171,7 @@ services:
       - 5050
       - 8800
     environment:
-      - SIGNERNODE=signernode-2
+      - SIGNERNODE=signernode-2:8080
     volumes:
       - pbft-shared:/pbft-shared
     command: |
@@ -209,7 +209,7 @@ services:
     volumes:
       - pbft-shared:/pbft-shared
     environment:
-      - SIGNERNODE=signernode-3
+      - SIGNERNODE=signernode-3:8080
     command: |
       bash -c "
         if [ -e /pbft-shared/validators/validator-2.priv ]; then
@@ -244,7 +244,7 @@ services:
       - 5050
       - 8800
     environment:
-      - SIGNERNODE=signernode-4
+      - SIGNERNODE=signernode-4:8080
     volumes:
       - pbft-shared:/pbft-shared
     command: |
@@ -282,7 +282,7 @@ services:
       - 5050
       - 8800
     environment:
-      - SIGNERNODE=signernode-5
+      - SIGNERNODE=signernode-5:8080
     volumes:
       - pbft-shared:/pbft-shared
     command: |

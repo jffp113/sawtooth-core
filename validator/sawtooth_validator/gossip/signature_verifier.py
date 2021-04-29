@@ -25,7 +25,7 @@ from sawtooth_validator.protobuf.transaction_pb2 import TransactionHeader
 from sawtooth_validator.protobuf.transaction_pb2 import TransactionList
 from sawtooth_validator.protobuf.batch_pb2 import BatchHeader
 from sawtooth_validator.protobuf.batch_pb2 import GroupEnvelop
-from sawtooth_validator.protobuf.signerMessages_pb2 import ClientVerifyMessage
+from sawtooth_validator.protobuf.signerMessages_pb2 import ClientVerifyMessage, ClientVerifyResponse
 from sawtooth_validator.protobuf.block_pb2 import BlockHeader
 from sawtooth_validator.protobuf.consensus_pb2 import \
     ConsensusPeerMessageHeader
@@ -114,13 +114,12 @@ def validate_group_signature(batch):
     transaction_list.transactions.extend(transactions)
     transactions_bytes = transaction_list.SerializeToString()
 
-    verify_group_signature(transactions_bytes, envelop.signature, envelop.public_key, envelop.scheme)
-    return True
+    return verify_group_signature(transactions_bytes, envelop.signature, envelop.public_key, envelop.scheme)
 
 
 def verify_group_signature(digest, group_signature, group_public_key, scheme):
     signernode_endpoint = os.getenv('SIGNERNODE', "signernode-1")
-    endpoint = "http://{}:8080/verify".format(signernode_endpoint)
+    endpoint = "http://{}/verify".format(signernode_endpoint)
 
     # Create client verify message
     verifyReq = ClientVerifyMessage()
@@ -129,7 +128,7 @@ def verify_group_signature(digest, group_signature, group_public_key, scheme):
     verifyReq.digest = digest
     verifyReq.signature = group_signature
 
-    # todo this is security risk, in order to remove remove this genesis block must be signed
+    # todo this is security risk, in order to remove remove this, genesis block must be signed
     if len(group_public_key) == 0:
         LOGGER.info("Ignoring signature, group public key empty")
         return True
@@ -139,8 +138,11 @@ def verify_group_signature(digest, group_signature, group_public_key, scheme):
     # Send verification request
     r = requests.post(url=endpoint, data=data)
     # Todo parse the response
-    LOGGER.info("Received response %s", r.text)
-    return True
+    response = ClientVerifyResponse()
+    response.ParseFromString(r.content)
+    isValid = (response.status == ClientVerifyResponse.OK)
+    LOGGER.info("Received response for group signature verification: %s", r.text)
+    return isValid
 
 
 def is_valid_transaction(txn):
