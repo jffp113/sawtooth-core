@@ -38,7 +38,7 @@ SIGNER_PORT=7000
   echo "- ${SERVERS[ID - 1]}:${API_PORT}"
   echo $CMD | ssh -t jfp@${SERVERS[ID - 1]} bash
 
-sleep 5
+#sleep 5
 
 for s in ${SERVERS[@]:1}
 do
@@ -48,11 +48,15 @@ do
   SIGNER_PORT=$((SIGNER_PORT + 1))
 
 
-#  options=""
-#  for peer in ${SERVERS[@]::$((ID - 1))}
-#  do
-#    options="${options} --peers tcp://${peer}:${SEED_PORT}"
-#  done
+  options=""
+  index=0
+  for server in ${SERVERS[@]::$((ID - 1))}
+  do
+    options="${options} --peers tcp://${server}:$((SEED_PORT + index))"
+    index=$((index + 1))
+  done
+
+  echo ${options}
 
   CMD="bash -c '
     export ID=${ID} &&
@@ -60,12 +64,11 @@ do
     export HOST_PORT=${HOST_PORT} &&
     export API_PORT=${API_PORT} &&
     export SIGNERNODE=${SIGNERSNODES[ID - 1]}:${SIGNER_PORT}
-    export SEED=tcp://${SERVERS[0]}:${SEED_PORT} &&
+    export SEED=\"${options}\" &&
     cd /home/jfp/sawtooth-core/docker/jorge/setup/config &&
     docker-compose -p ${ID} -f sawtooth-peer.yaml up --detach
     '
   "
   echo $CMD | ssh -t jfp@${s} bash
   echo "- ${s}:${API_PORT}"
-  #echo $CMD
 done

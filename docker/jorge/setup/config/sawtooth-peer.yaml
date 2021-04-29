@@ -77,7 +77,7 @@ services:
           --scheduler parallel \
           --peering static \
           --maximum-peer-connectivity 10000 \
-          --seeds $SEED \
+          $SEED \
       "
 # -------------=== pbft engines ===-------------
   pbft:
