@@ -1,0 +1,106 @@
+# export ID=2
+# export HOST_IP=188.83.81.75
+# export HOST_PORT=8800
+# export API_PORT=8008
+# export SIGNERNODE=signernode-1
+# export PBFT_KEYS=[k1, k2, k3]
+
+version: '3.6'
+
+services:
+
+# -------------=== rest api ===-------------
+
+  rest-api:
+    image: ghcr.io/jffp113/sawtooth-rest-api:latest
+    container_name: sawtooth-rest-api-default
+    expose:
+      - 8008
+    ports:
+      - ${API_PORT}:8008
+    command: |
+      bash -c "
+        sawtooth-rest-api \
+          --connect tcp://validator:4004 \
+          --bind rest-api:8008
+      "
+    stop_signal: SIGKILL
+
+# -------------=== shell ===-------------
+
+  shell:
+    image: hyperledger/sawtooth-shell:nightly
+    container_name: sawtooth-shell-default
+#    volumes:
+#      - pbft-shared:/pbft-shared
+    command: |
+      bash -c "
+        sawtooth keygen
+        tail -f /dev/null
+      "
+    depends_on:
+      - "validator"
+    stop_signal: SIGKILL
+
+# -------------=== validators ===-------------
+
+  validator:
+     #image: hyperledger/sawtooth-rest-api:nightly
+    image: ghcr.io/jffp113/sawtooth-validator:latest
+    container_name: sawtooth-validator-default-0
+    expose:
+      - 4004
+      - 5050
+      - ${HOST_PORT}
+    ports:
+      - ${HOST_PORT}:${HOST_PORT}
+    environment:
+      - SIGNERNODE=${SIGNERNODE}
+#    volumes:
+#      - pbft-shared:/pbft-shared
+    command: |
+      bash -c "
+        cp /all/validator-${ID}.priv /etc/sawtooth/keys/validator.priv &&
+        cp /all/validator-${ID}.pub /etc/sawtooth/keys/validator.pub &&
+        if [ ! -e config-genesis.batch ]; then
+               sawset genesis -k /all/validator-${ID}.priv -o config-genesis.batch
+        fi &&
+        if [ ! -e config.batch ]; then
+         sawset proposal create \
+            -k /all/validator-${ID}.priv \
+            sawtooth.consensus.algorithm.name=pbft \
+            sawtooth.consensus.algorithm.version=1.0 \
+            sawtooth.consensus.pbft.members=\\['\"'$$(cat /all/validator-1.pub)'\"','\"'$$(cat /all/validator-2.pub)'\"','\"'$$(cat /all/validator-3.pub)'\"','\"'$$(cat /all/validator-4.pub)'\"','\"'$$(cat /all/validator-5.pub)'\"','\"'$$(cat /all/validator-6.pub)'\"','\"'$$(cat /all/validator-7.pub)'\"'\\] \
+            sawtooth.publisher.max_batches_per_block=1200 \
+            -o config.batch
+        fi &&
+        if [ ! -e /var/lib/sawtooth/genesis.batch ]; then
+          sawadm genesis config-genesis.batch config.batch
+        fi &&
+        if [ ! -e /root/.sawtooth/keys/my_key.priv ]; then
+          sawtooth keygen my_key
+        fi &&
+        sawtooth-validator -vv \
+          --endpoint tcp://${HOST_IP}:${HOST_PORT} \
+          --bind component:tcp://eth0:4004 \
+          --bind consensus:tcp://eth0:5050 \
+          --bind network:tcp://eth0:${HOST_PORT} \
+          --scheduler parallel \
+          --peering static \
+          --maximum-peer-connectivity 10000
+      "
+# -------------=== pbft engines ===-------------
+  pbft:
+    image: hyperledger/sawtooth-pbft-engine:nightly
+    container_name: sawtooth-pbft-engine-default-0
+    command: pbft-engine -vv --connect tcp://validator:5050
+    stop_signal: SIGKILL
+
+# -------------=== intkey smart contract ===-------------
+  intkey-tp:
+    image: hyperledger/sawtooth-intkey-tp-python:nightly
+    container_name: sawtooth-intkey-tp-python-default-0
+    expose:
+      - 4004
+    command: intkey-tp-python -C tcp://validator:4004
+    stop_signal: SIGKILL
