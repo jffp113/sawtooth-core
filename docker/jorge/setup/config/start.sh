@@ -12,25 +12,22 @@ SEED_PORT=8800 #Do not change
 HOST_PORT=$SEED_PORT
 API_PORT=8008
 SIGNER_PORT=7000
-keysPath="./../keys/all"
+#keysPath="./../keys/all"
 
 
 #### Calculate PBFT keys
 
-keys="["
-for index in ${!SERVERS[@]}
-do
-  keys="${keys} \"$(cat "${keysPath}/validator-$((ID + index)).pub")\""
-  if [ ${#SERVERS[@]} -gt $((ID + index)) ]
-  then
-    keys="${keys} , "
-  fi
-done
-keys="${keys} ]"
-
-
-echo ${keys}
-
+#keys=""
+#for index in ${!SERVERS[@]}
+#do
+#  keys="${keys}'\"'$(cat "${keysPath}/validator-$((ID + index)).pub")'\"'"
+#  if [ ${#SERVERS[@]} -gt $((ID + index)) ]
+#  then
+#    keys="${keys},"
+#  fi
+#done
+#
+#echo -t "${keys}"
 
 ###Start launching first node
 
@@ -42,12 +39,12 @@ echo ${keys}
     export SIGNERNODE=${SIGNERSNODES[ID - 1]}:${SIGNER_PORT} &&
     export PBFT_KEYS=\"${keys}\" &&
     cd /home/jfp/sawtooth-core/docker/jorge/setup/config &&
-    docker-compose -p ${ID} -f sawtooth-first.yaml up --detach
+    docker-compose -p ${ID} -f sawtooth-first.yaml up
     '
   "
   echo "- ${SERVERS[ID - 1]}:${API_PORT}"
-  #echo $CMD | ssh -t jfp@${SERVERS[ID - 1]} bash
   echo $CMD
+  echo $CMD | ssh -t jfp@${SERVERS[ID - 1]} bash
 sleep 1
 
 for s in ${SERVERS[@]:1}
@@ -79,6 +76,6 @@ do
     docker-compose -p ${ID} -f sawtooth-peer.yaml up --detach
     '
   "
-  #echo $CMD | ssh -t jfp@${s} bash
+  echo $CMD | ssh -t jfp@${s} bash
   echo "- ${s}:${API_PORT}"
 done
