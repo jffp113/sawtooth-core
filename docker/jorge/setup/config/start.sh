@@ -15,19 +15,6 @@ SIGNER_PORT=7000
 #keysPath="./../keys/all"
 
 
-#### Calculate PBFT keys
-
-#keys=""
-#for index in ${!SERVERS[@]}
-#do
-#  keys="${keys}'\"'$(cat "${keysPath}/validator-$((ID + index)).pub")'\"'"
-#  if [ ${#SERVERS[@]} -gt $((ID + index)) ]
-#  then
-#    keys="${keys},"
-#  fi
-#done
-#
-#echo -t "${keys}"
 
 ###Start launching first node
 
@@ -37,15 +24,15 @@ SIGNER_PORT=7000
     export HOST_PORT=${HOST_PORT} &&
     export API_PORT=${API_PORT} &&
     export SIGNERNODE=${SIGNERSNODES[ID - 1]}:${SIGNER_PORT} &&
-    export PBFT_KEYS=\"${keys}\" &&
     cd /home/jfp/sawtooth-core/docker/jorge/setup/config &&
-    docker-compose -p ${ID} -f sawtooth-first.yaml up
+    docker-compose -p ${ID} -f sawtooth-first.yaml up --detach
     '
   "
   echo "- ${SERVERS[ID - 1]}:${API_PORT}"
   echo $CMD
   echo $CMD | ssh -t jfp@${SERVERS[ID - 1]} bash
-sleep 1
+
+sleep 3
 
 for s in ${SERVERS[@]:1}
 do
