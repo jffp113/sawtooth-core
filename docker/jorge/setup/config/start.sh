@@ -3,8 +3,9 @@
 # Purpose: Run multiple sawtooth nodes on multiple machines
 # ----------------------------------------------------
 
-SERVERS=(51.83.75.29 51.83.75.29 51.83.75.29 51.83.75.29 51.83.75.29)
+SERVERS=(146.59.230.10 146.59.229.32 146.59.228.136 141.95.18.233 135.125.207.187)
 SIGNERSNODES=(51.83.75.29 51.83.75.29 51.83.75.29 51.83.75.29 51.83.75.29)
+BOOSTRAP_CONFIG="/home/ubuntu/sawtooth-core/docker/jorge/setup/config/first/sawtooth-first-5.yaml"
 
 #Do not change bellow
 ID=1
@@ -12,8 +13,6 @@ SEED_PORT=8800 #Do not change
 HOST_PORT=$SEED_PORT
 API_PORT=8008
 SIGNER_PORT=7000
-#keysPath="./../keys/all"
-
 
 
 ###Start launching first node
@@ -24,13 +23,12 @@ SIGNER_PORT=7000
     export HOST_PORT=${HOST_PORT} &&
     export API_PORT=${API_PORT} &&
     export SIGNERNODE=${SIGNERSNODES[ID - 1]}:${SIGNER_PORT} &&
-    cd /home/jfp/sawtooth-core/docker/jorge/setup/config &&
-    docker-compose -p ${ID} -f sawtooth-first.yaml up --detach
+    docker-compose -p ${ID} -f ${BOOSTRAP_CONFIG} up --detach
     '
   "
-  echo "- ${SERVERS[ID - 1]}:${API_PORT}"
+  echo "- \"${SERVERS[ID - 1]}:${API_PORT}\"" > peers.txt
   echo $CMD
-  echo $CMD | ssh -t jfp@${SERVERS[ID - 1]} bash
+  echo $CMD | ssh -t ubuntu@${SERVERS[ID - 1]} bash
 
 sleep 3
 
@@ -59,10 +57,10 @@ do
     export API_PORT=${API_PORT} &&
     export SIGNERNODE=${SIGNERSNODES[ID - 1]}:${SIGNER_PORT}
     export SEED=\"${options}\" &&
-    cd /home/jfp/sawtooth-core/docker/jorge/setup/config &&
+    cd /home/ubuntu/sawtooth-core/docker/jorge/setup/config &&
     docker-compose -p ${ID} -f sawtooth-peer.yaml up --detach
     '
   "
-  echo $CMD | ssh -t jfp@${s} bash
-  echo "- ${s}:${API_PORT}"
+  echo $CMD | ssh -t ubuntu@${s} bash
+  echo "- \"${s}:${API_PORT}\"" >> peers.txt
 done
