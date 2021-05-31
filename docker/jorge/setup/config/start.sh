@@ -3,9 +3,9 @@
 # Purpose: Run multiple sawtooth nodes on multiple machines
 # ----------------------------------------------------
 
-SERVERS=(146.59.230.10 146.59.229.32 146.59.228.136 141.95.18.233 135.125.207.187)
-SIGNERSNODES=(51.83.75.29 51.83.75.29 51.83.75.29 51.83.75.29 51.83.75.29)
-BOOSTRAP_CONFIG="/home/ubuntu/sawtooth-core/docker/jorge/setup/config/first/sawtooth-first-5.yaml"
+SERVERS=(146.59.230.10 146.59.229.32 141.95.18.233 141.95.18.234 139.99.171.133 139.99.171.133 139.99.236.2 51.79.53.170 51.79.53.77 51.79.53.77)
+SIGNERSNODES=(146.59.230.10 146.59.229.32 141.95.18.233 141.95.18.234 139.99.171.133 139.99.171.133 139.99.236.2 51.79.53.170 51.79.53.77 51.79.53.77)
+BOOSTRAP_CONFIG="/home/ubuntu/sawtooth-core/docker/jorge/setup/config/first/sawtooth-first-7.yaml"
 
 #Do not change bellow
 ID=1

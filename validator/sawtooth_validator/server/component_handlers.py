@@ -79,12 +79,13 @@ def add(
         client_handlers.client_batch_submit_request_preprocessor,
         client_thread_pool)
 
-    dispatcher.add_handler(
-        validator_pb2.Message.CLIENT_BATCH_SUBMIT_REQUEST,
-        ClientBatchSubmitBackpressureHandler(
-            public_key,
-            journal.is_batch_pool_full),
-        client_thread_pool)
+    # Removed backpressure handler
+    # dispatcher.add_handler(
+    #     validator_pb2.Message.CLIENT_BATCH_SUBMIT_REQUEST,
+    #     ClientBatchSubmitBackpressureHandler(
+    #         public_key,
+    #         journal.is_batch_pool_full),
+    #     client_thread_pool)
 
     # TODO check signature and drop msg if not valid
     dispatcher.add_handler(
