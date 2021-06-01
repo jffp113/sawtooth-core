@@ -9,7 +9,7 @@ version: '3.6'
 
 services:
 
-# -------------=== rest api ===-------------
+  # -------------=== rest api ===-------------
 
   rest-api:
     image: ghcr.io/jffp113/sawtooth-rest-api:latest
@@ -26,13 +26,13 @@ services:
       "
     stop_signal: SIGKILL
 
-# -------------=== shell ===-------------
+  # -------------=== shell ===-------------
 
   shell:
     image: hyperledger/sawtooth-shell:nightly
     container_name: sawtooth-shell-default
-#    volumes:
-#      - pbft-shared:/pbft-shared
+    #    volumes:
+    #      - pbft-shared:/pbft-shared
     command: |
       bash -c "
         sawtooth keygen
@@ -42,10 +42,10 @@ services:
       - "validator"
     stop_signal: SIGKILL
 
-# -------------=== validators ===-------------
+  # -------------=== validators ===-------------
 
   validator:
-     #image: hyperledger/sawtooth-rest-api:nightly
+    #image: hyperledger/sawtooth-rest-api:nightly
     image: ghcr.io/jffp113/sawtooth-validator:latest
     container_name: sawtooth-validator-default-0
     expose:
@@ -56,8 +56,8 @@ services:
       - ${HOST_PORT}:${HOST_PORT}
     environment:
       - SIGNERNODE=${SIGNERNODE}
-#    volumes:
-#      - pbft-shared:/pbft-shared
+    #    volumes:
+    #      - pbft-shared:/pbft-shared
     command: |
       bash -c "
         cp /all/validator-${ID}.priv /etc/sawtooth/keys/validator.priv &&
@@ -70,7 +70,7 @@ services:
             -k /all/validator-${ID}.priv \
             sawtooth.consensus.algorithm.name=pbft \
             sawtooth.consensus.algorithm.version=1.0 \
-            sawtooth.consensus.pbft.members=\\['\"'$$(cat /all/validator-1.pub)'\"','\"'$$(cat /all/validator-2.pub)'\"','\"'$$(cat /all/validator-3.pub)'\"','\"'$$(cat /all/validator-4.pub)'\"','\"'$$(cat /all/validator-5.pub)'\"','\"'$$(cat /all/validator-6.pub)'\"','\"'$$(cat /all/validator-7.pub)'\"','\"'$$(cat /all/validator-8.pub)'\"','\"'$$(cat /all/validator-9.pub)'\"','\"'$$(cat /all/validator-10.pub)'\"','\"'$$(cat /all/validator-11.pub)'\"','\"'$$(cat /all/validator-12.pub)'\"','\"'$$(cat /all/validator-13.pub)'\"','\"'$$(cat /all/validator-14.pub)'\"','\"'$$(cat /all/validator-15.pub)'\"','\"'$$(cat /all/validator-16.pub)'\"'','\"'$$(cat /all/validator-17.pub)'\"','\"'$$(cat /all/validator-18.pub)'\"','\"'$$(cat /all/validator-19.pub)'\"'\\] \
+            sawtooth.consensus.pbft.members=\\['\"'$$(cat /all/validator-1.pub)'\"','\"'$$(cat /all/validator-2.pub)'\"','\"'$$(cat /all/validator-3.pub)'\"','\"'$$(cat /all/validator-4.pub)'\"','\"'$$(cat /all/validator-5.pub)'\"','\"'$$(cat /all/validator-6.pub)'\"','\"'$$(cat /all/validator-7.pub)'\"','\"'$$(cat /all/validator-8.pub)'\"','\"'$$(cat /all/validator-9.pub)'\"','\"'$$(cat /all/validator-10.pub)'\"','\"'$$(cat /all/validator-11.pub)'\"','\"'$$(cat /all/validator-12.pub)'\"','\"'$$(cat /all/validator-13.pub)'\"','\"'$$(cat /all/validator-14.pub)'\"','\"'$$(cat /all/validator-15.pub)'\"','\"'$$(cat /all/validator-16.pub)'\"','\"'$$(cat /all/validator-17.pub)'\"','\"'$$(cat /all/validator-18.pub)'\"','\"'$$(cat /all/validator-19.pub)'\"'\\] \
             sawtooth.publisher.max_batches_per_block=1200 \
             -o config.batch
         fi &&
@@ -89,14 +89,14 @@ services:
           --peering static \
           --maximum-peer-connectivity 10000
       "
-# -------------=== pbft engines ===-------------
+  # -------------=== pbft engines ===-------------
   pbft:
     image: hyperledger/sawtooth-pbft-engine:nightly
     container_name: sawtooth-pbft-engine-default-0
     command: pbft-engine -vv --connect tcp://validator:5050
     stop_signal: SIGKILL
 
-# -------------=== intkey smart contract ===-------------
+  # -------------=== intkey smart contract ===-------------
   intkey-tp:
     image: hyperledger/sawtooth-intkey-tp-python:nightly
     container_name: sawtooth-intkey-tp-python-default-0
